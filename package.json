@@ -1,0 +1,10 @@
+{
+  "name": "dns_tree",
+  "version": "1.0.0",
+  "description": "test task for dns-shop",
+  "keywords": [
+    "dns-shop"
+  ],
+  "author": "GapArchi",
+  "license": "ISC"
+}
