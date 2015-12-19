@@ -3,6 +3,8 @@ var react = require('gulp-react');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 
+process.env.NODE_ENV = 'development';
+
 gulp.task('transform', function(){
 	gulp.src('src/*.jsx')
 		.pipe(react())
