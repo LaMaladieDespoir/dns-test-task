@@ -1,5 +1,8 @@
 var React = require('react');
 var $ = require('jquery-browserify');
+var DragDropContext = require('react-dnd').DragDropContext;
+var HTML5Backend = require('react-dnd-html5-backend');
+var Category = require('./viewCategory');
 
 var DnsTree = React.createClass({
 	getInitialState: function() {
@@ -16,9 +19,6 @@ var DnsTree = React.createClass({
 			});
 		}.bind(this));
 	},
-	handlerFolderClick: function(event) {
-		$(event.target).next('ul').toggle();
-	},
 	loopCategory: function(categories,files){
 		return (<ul>{categories.map(function(category,ikey){
 						var child;
@@ -27,7 +27,7 @@ var DnsTree = React.createClass({
 						}else{
 							child = null;
 						}
-						return (<li key={ikey}><b onClick={this.handlerFolderClick}>{category.name}</b>{child}</li>);
+						return (<li key={ikey}><Category data={category} />{child}</li>);
 					}.bind(this))}
 
 					{files.map(function(file,ikey){
@@ -40,4 +40,4 @@ var DnsTree = React.createClass({
 	}
 });
 
-module.exports = DnsTree;
+module.exports = DragDropContext(HTML5Backend)(DnsTree);
