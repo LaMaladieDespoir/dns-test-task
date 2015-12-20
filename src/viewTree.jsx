@@ -12,7 +12,7 @@ var DnsTree = React.createClass({
 		this.refreshData();
 	},
 	refreshData: function(){
-		$.getJSON('/ajax.php',{action:'get'},function(data) {
+		$.getJSON('/ajax.php',{view:'getall'},function(data) {
 			console.log(data);
 			this.setState({
 				tree:data,

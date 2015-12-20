@@ -1,125 +1,101 @@
 <?php
+require 'vendor/autoload.php';
 
-$categories = [
-	[
-		'id_cat'=>1,
-		'id_parent'=>0,
-		'name'=>'folder 1',
-		'order'=> 0
-	],[
-		'id_cat'=>2,
-		'id_parent'=>0,
-		'name'=>'folder 2',
-		'order'=> 1
-	],[
-		'id_cat'=>3,
-		'id_parent'=>2,
-		'name'=>'folder 3',
-		'order'=> 0
-	],[
-		'id_cat'=>4,
-		'id_parent'=>2,
-		'name'=>'folder 4',
-		'order'=> 0
-	],[
-		'id_cat'=>5,
-		'id_parent'=>4,
-		'name'=>'folder 5',
-		'order'=> 0
-	],[
-		'id_cat'=>6,
-		'id_parent'=>0,
-		'name'=>'folder 6',
-		'order'=> 0
-	]
+$app = new miniController();
+$app->render();
 
-];
-$files = [
-	[
-		'id_file'=>1,
-		'id_cat'=>2,
-		'name'=>'file 1',
-		'order'=> 0
-	],[
-		'id_file'=>2,
-		'id_cat'=>2,
-		'name'=>'file 2',
-		'order'=> 1
-	],[
-		'id_file'=>3,
-		'id_cat'=>2,
-		'name'=>'file 3',
-		'order'=> 0
-	],[
-		'id_file'=>4,
-		'id_cat'=>3,
-		'name'=>'file 4',
-		'order'=> 0
-	],[
-		'id_file'=>5,
-		'id_cat'=>5,
-		'name'=>'file 5',
-		'order'=> 0
-	],[
-		'id_file'=>6,
-		'id_cat'=>5,
-		'name'=>'file 6',
-		'order'=> 0
-	],[
-		'id_file'=>7,
-		'id_cat'=>0,
-		'name'=>'file 7',
-		'order'=> 0
-	],[
-		'id_file'=>8,
-		'id_cat'=>0,
-		'name'=>'file 8',
-		'order'=> 0
-	],[
-		'id_file'=>9,
-		'id_cat'=>4,
-		'name'=>'file 9',
-		'order'=> 0
-	]
-];
-
-
-$arr =  flat2tree($categories,$files);
-print_r(json_encode($arr));
-
-function flat2tree(&$flat,$files){
-    $tree = array();
-    $nodeMap = array();
-
-    $N = (is_array($flat)) ? count($flat) : 0;
-
-    for ($i=0; $i<$N; ++$i){
-        $node =& $flat[$i];
-		$node['files']=findFiles($files,$node['id_cat']);
-		$node['child'] = [];
-        if (isset($nodeMap[$node['id_parent']])){
-            $parent =& $nodeMap[$node['id_parent']];
-            if (!isset($parent['child']) || !is_array($parent['child'])){
-                $parent['child'] = array();
-            }
-            $parent['child'][] = $node;
-            $nodeMap[$node['id_cat']] =& $parent['child'][count($parent['child']) - 1];
-        }
-        else{
-            $tree[] = $node;
-            $nodeMap[$node['id_cat']] =& $tree[count($tree) - 1];
-        }
-    }
-    return $tree;
-}
-
-function findFiles($files,$id_cat){
-	$out = [];
-	foreach ($files as $file) {
-		if($file['id_cat'] === $id_cat){
-			$out[]=$file;
+class miniController{
+	private $get;
+	private $view;
+        private $database;
+	function __construct(){
+		if (!isset($_GET['view'])){
+			$this->view = 'error';
+			return;
 		}
+		switch ($_GET['view']) {
+			case 'getall':
+			case 'add':
+			case 'open':
+			case 'close':
+				$this->view = $_GET['view'];
+				break;
+			default:
+				$this->view = 'error';
+				return;
+		}
+                $this->database = new medoo([
+			'database_type' => 'mysql',
+			'database_name' => 'dns_tree',
+			'server' => 'localhost',
+			'username' => 'dns_tree',
+			'password' => 'dns_treedns_tree',
+			'charset' => 'utf8',
+		]);
 	}
-	return $out;
+
+	function render(){
+		$methodName = $this->view."Render";
+		$this->$methodName();
+	}
+
+	private function getallRender(){
+            $categories = $this->database->select('categories',
+                            ['id_cat','id_parent','name','sort','open']
+                        );
+            $files = $this->database->select('files',
+                            ['id_file','id_cat','name','sort']
+                        );
+            $out = self::flat2tree($categories,$files);
+            print_r(json_encode($out));
+	}
+
+	private function addRender(){
+		exit('add');
+	}
+	private function openRender(){
+		exit('open');
+	}
+	private function closeRender(){
+		exit('close');
+	}
+	private function errorRender(){
+		exit('error');
+	}
+
+        private static function flat2tree(&$flat,$files){
+            $tree = array();
+            $nodeMap = array();
+
+            $N = (is_array($flat)) ? count($flat) : 0;
+
+            for ($i=0; $i<$N; ++$i){
+                $node =& $flat[$i];
+                       $node['files']=  self::findFiles($files,$node['id_cat']);
+                       $node['child'] = [];
+                if (isset($nodeMap[$node['id_parent']])){
+                    $parent =& $nodeMap[$node['id_parent']];
+                    if (!isset($parent['child']) || !is_array($parent['child'])){
+                        $parent['child'] = array();
+                    }
+                    $parent['child'][] = $node;
+                    $nodeMap[$node['id_cat']] =& $parent['child'][count($parent['child']) - 1];
+                }
+                else{
+                    $tree[] = $node;
+                    $nodeMap[$node['id_cat']] =& $tree[count($tree) - 1];
+                }
+            }
+            return $tree;
+        }
+
+        private static function findFiles($files,$id_cat){
+               $out = [];
+               foreach ($files as $file) {
+                       if($file['id_cat'] === $id_cat){
+                               $out[]=$file;
+                       }
+               }
+               return $out;
+        }
 }
- ?>
