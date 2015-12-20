@@ -19,6 +19,9 @@ var DnsTree = React.createClass({
 			});
 		}.bind(this));
 	},
+	reRender: function(){
+		this.forceUpdate();
+	},
 	loopCategory: function(categories,files){
 		return (<ul>{categories.map(function(category,ikey){
 						var child;
@@ -27,7 +30,9 @@ var DnsTree = React.createClass({
 						}else{
 							child = null;
 						}
-						return (<li key={ikey}><Category data={category} />{child}</li>);
+						return (<li key={ikey}><Category
+							data={category}
+							reRender={this.reRender}/>{child}</li>);
 					}.bind(this))}
 
 					{files.map(function(file,ikey){
