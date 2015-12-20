@@ -4,6 +4,8 @@ var DragDropContext = require('react-dnd').DragDropContext;
 var HTML5Backend = require('react-dnd-html5-backend');
 var Category = require('./viewCategory');
 
+var Box = require('./box');
+
 var DnsTree = React.createClass({
 	getInitialState: function() {
 		return {tree:[]};
@@ -19,6 +21,9 @@ var DnsTree = React.createClass({
 			});
 		}.bind(this));
 	},
+	moveCategory:function(){
+		console.log('DnsTree.moveCategory');
+	},
 	loopCategory: function(categories,files){
 		return (<ul>{categories.map(function(category,ikey){
 						var child;
@@ -27,7 +32,7 @@ var DnsTree = React.createClass({
 						}else{
 							child = null;
 						}
-						return (<li key={ikey}><Category data={category} />{child}</li>);
+						return (<li key={ikey}><Category data={category} moveCategory={this.moveCategory}/>{child}</li>);
 					}.bind(this))}
 
 					{files.map(function(file,ikey){
@@ -36,7 +41,10 @@ var DnsTree = React.createClass({
 			</ul>);
 	},
 	render: function() {
-		return (<div>{this.loopCategory(this.state.tree,[])}</div>);
+		return (<div>
+			{this.loopCategory(this.state.tree,[])}
+				<Box />
+			</div>);
 	}
 });
 

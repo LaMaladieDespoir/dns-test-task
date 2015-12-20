@@ -4,7 +4,21 @@ var DragSource = require('react-dnd').DragSource;
 
 var categorySource = {
 	beginDrag: function (props) {
-		return {};
+		console.info('beginDrag');
+		console.log(props.data.id_cat);
+		return {id_cat:props.data.id_cat};
+	},
+	endDrag:function(props, monitor) {
+		var item = monitor.getItem();
+		var dropResult = monitor.getDropResult();
+		console.info('endDrag');
+		console.log(item);
+
+		if (dropResult) {
+			console.log(dropResult);
+		}else{
+			console.log('нет получаетля');
+		}
 	}
 };
 
@@ -25,11 +39,13 @@ var Category = React.createClass({
 		$(event.target).next('ul').toggle();
 	},
 	render: function() {
-		var connectDragSource = this.props.connectDragSource;
 		var isDragging = this.props.isDragging;
+
+
+		var connectDragSource = this.props.connectDragSource;
 		return connectDragSource(<b onClick={this.handlerFolderClick}>{this.props.data.name}</b>);
 	}
 });
 
-module.exports = Category;
+//module.exports = Category;
 module.exports = DragSource('category', categorySource, collect)(Category);
