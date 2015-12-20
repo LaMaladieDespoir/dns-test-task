@@ -83,11 +83,15 @@ var Category = React.createClass({
 		var isDragging = this.props.isDragging;
 		var typeOver = this.props.typeOver
 		var isOver = this.props.isOver;
+		var style={color:'black'};
 
 		if(isOver){
-			var style = (typeOver)?{color:'red'}:{color:'green'};
-		}else{
-			var style = {color:'black'};
+			style.backgroundColor='#BBFFFF';
+			if(typeOver){
+				style.borderBottom='1px dotted green';
+			}else{
+				style.borderTop='1px dotted green';
+			}
 		}
 
 		var connectDragSource = this.props.connectDragSource;
