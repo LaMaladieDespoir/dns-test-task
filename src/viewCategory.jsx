@@ -95,7 +95,7 @@ var Category = React.createClass({
 	},
 	render: function() {
 		var isDragging = this.props.isDragging;
-		var how_to_add = this.props.how_to_add
+		var how_to_add = this.props.how_to_add;
 		var isOver = this.props.isOver;
 		var style={color:'black'};
 
@@ -115,9 +115,9 @@ var Category = React.createClass({
 		var connectDropTarget = this.props.connectDropTarget;
 
 		if(this.props.data.is_category == 1){
-			return connectDragSource(connectDropTarget(<b style={style} onClick={this.handlerFolderClick}>{this.props.data.name} {this.props.data.sort}</b>));
+			return connectDragSource(connectDropTarget(<span style={style} className="category" onClick={this.handlerFolderClick}>{this.props.data.name} {this.props.data.sort}</span>));
 		}else{
-			return connectDragSource(connectDropTarget(<span style={style}>{this.props.data.name} {this.props.data.sort}</span>));
+			return connectDragSource(connectDropTarget(<span style={style} className="file">{this.props.data.name} {this.props.data.sort}</span>));
 		}
 
 	}

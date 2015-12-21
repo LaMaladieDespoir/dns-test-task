@@ -1,0 +1,11 @@
+li{
+	margin:3px 0;
+	& > span{
+		position: relative;
+		padding:3px 0;
+	}
+}
+
+span.category{
+	font-weight: bold;
+}
