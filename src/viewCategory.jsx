@@ -83,11 +83,15 @@ var Category = React.createClass({
 		data:PropTypes.object.isRequired,
 	},
 	getInitialState: function() {
-		return {};
+		return {open:true};
 	},
 	handlerFolderClick: function(event) {
 		console.log(event.target);
-		$(event.target).parent().next('ul').toggle();
+		var el = $(event.target);
+		el.next('ul').toggle();
+		this.setState({
+			open:!this.state.open
+		});
 
 	},
 	changeStyle:function(){
@@ -97,7 +101,9 @@ var Category = React.createClass({
 		var isDragging = this.props.isDragging;
 		var how_to_add = this.props.how_to_add;
 		var isOver = this.props.isOver;
+		var is_category = this.props.data.is_category;
 		var style={color:'black'};
+		var classHtml;
 
 		if(isOver){
 			style.backgroundColor='#BBFFFF';
@@ -114,10 +120,19 @@ var Category = React.createClass({
 		var connectDragSource = this.props.connectDragSource;
 		var connectDropTarget = this.props.connectDropTarget;
 
-		if(this.props.data.is_category == 1){
-			return connectDragSource(connectDropTarget(<span style={style} className="category" onClick={this.handlerFolderClick}>{this.props.data.name} {this.props.data.sort}</span>));
+		if(this.state.open){
+			classHtml = 'open';
 		}else{
-			return connectDragSource(connectDropTarget(<span style={style} className="file">{this.props.data.name} {this.props.data.sort}</span>));
+			classHtml = 'closed';
+		}
+
+		if(is_category == 1){
+			classHtml+= ' category';
+			classHtml+= ('child' in this.props.data)?'':' empty';
+			return connectDragSource(connectDropTarget(<span style={style} className={classHtml} onClick={this.handlerFolderClick}>{this.props.data.name}</span>));
+		}else{
+			classHtml+= ' file';
+			return connectDragSource(connectDropTarget(<span style={style} className={classHtml}>{this.props.data.name}</span>));
 		}
 
 	}
