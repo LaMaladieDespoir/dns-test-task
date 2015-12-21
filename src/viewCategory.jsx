@@ -17,7 +17,7 @@ var categorySource = {
 		var dropResult = monitor.getDropResult();
 
 		//Drop на себя
-		if (item.arriving === dropResult.self_id){
+		if ((item.arriving === dropResult.self_id) || (item.arriving === dropResult.catcher)){
 			return;
 		}
 
