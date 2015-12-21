@@ -5,6 +5,9 @@ var DropTarget = require('react-dnd').DropTarget;
 var findDOMNode = require('react-dom').findDOMNode;
 var update  = require('react/lib/update');
 
+//переменная содержит информацию о том куда положить элемент. (вверх,cредина,низ)
+var how_to_add = false;
+
 var categorySource = {
 	beginDrag: function (props) {
 		return {arriving:props.data.id_cat};
@@ -13,38 +16,47 @@ var categorySource = {
 		var item = monitor.getItem();
 		var dropResult = monitor.getDropResult();
 
+		//Drop на себя
+		if (item.arriving === dropResult.self_id){
+			return;
+		}
+
 		if (dropResult) {
-			console.info('поймал');
-			console.log(item);
-			console.log(dropResult);
+			props.pushItem({
+							view:'push',
+							arriving:item.arriving,
+							catcher:dropResult.catcher,
+							sort:dropResult.sort,
+							how_to_add:how_to_add
+						});
 		}
 	}
 };
 
-//переменная содержит информацию о том куда положить элемент. (вверх,низ)
-var typeOver = false;
-
 var categoryTarget = {
 	drop:function(props) {
-		console.warn('categoryTarget.drop');
-		return {сatcher:props.data.id_cat};
+		var out = {self_id:props.data.id_cat};
+		if(props.data.is_category == 1 && how_to_add == 2){
+			out.catcher = props.data.id_cat;
+			out.sort = 0;
+		}else{
+			out.catcher = props.data.id_parent;
+			out.sort = props.data.sort;
+		}
+		return out;
 	},
 	hover:function(props, monitor, component) {
-
 		//координаты принимающего элемента
 		var hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
-		//высчитываем расстояние от окна браузера до половины элемента по горизонтали
-		var hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+		//делим высоту на три
+		var hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 3;
 		// Координаты мыши пользователя
 		var clientOffset = monitor.getClientOffset();
 		var hoverClientY = clientOffset.y - hoverBoundingRect.top;
-		var nextElement = (hoverClientY > hoverMiddleY)?true:false;
 
-		typeOver = nextElement;
-
-		//console.log(component);
-		console.log(monitor.isOver());
-
+		//получаем три состояния наведения мыши на элемент 1 - навреху, 2 - по средине, 3 внизу;
+		var hover_status = Math.ceil(hoverClientY/hoverMiddleY);
+		how_to_add = hover_status;
 		props.reRender();
 	}
 };
@@ -60,7 +72,7 @@ function collectDrop(connect,monitor) {
 		connectDropTarget: connect.dropTarget(),
 		canDrop: monitor.canDrop(),
 		isOver: monitor.isOver(),
-		typeOver:typeOver
+		how_to_add:how_to_add
 	}
 }
 
@@ -81,22 +93,31 @@ var Category = React.createClass({
 	},
 	render: function() {
 		var isDragging = this.props.isDragging;
-		var typeOver = this.props.typeOver
+		var how_to_add = this.props.how_to_add
 		var isOver = this.props.isOver;
 		var style={color:'black'};
 
 		if(isOver){
 			style.backgroundColor='#BBFFFF';
-			if(typeOver){
-				style.borderBottom='1px dotted green';
-			}else{
-				style.borderTop='1px dotted green';
+			switch (how_to_add) {
+				case 1:
+					style.borderTop = '2px dotted green';
+				break;
+				case 3:
+					style.borderBottom = '2px dotted green';
+					break;
 			}
 		}
 
 		var connectDragSource = this.props.connectDragSource;
 		var connectDropTarget = this.props.connectDropTarget;
-		return connectDragSource(connectDropTarget(<b style={style} onClick={this.handlerFolderClick}>{this.props.data.name}</b>));
+
+		if(this.props.data.is_category == 1){
+			return connectDragSource(connectDropTarget(<b style={style} onClick={this.handlerFolderClick}>{this.props.data.name} {this.props.data.sort}</b>));
+		}else{
+			return connectDragSource(connectDropTarget(<span style={style}>{this.props.data.name} {this.props.data.sort}</span>));
+		}
+
 	}
 });
 

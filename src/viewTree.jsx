@@ -19,26 +19,31 @@ var DnsTree = React.createClass({
 			});
 		}.bind(this));
 	},
+	pushItem: function(request_var){
+		var context =this;
+		$.get('/ajax.php',request_var).done(function( data ) {
+			context.refreshData();
+		});
+
+	},
 	reRender: function(){
 		this.forceUpdate();
 	},
 	loopCategory: function(categories,files){
 		return (<ul>{categories.map(function(category,ikey){
 						var child;
-						if (category.child.length || category.files.length) {
+						if (category.is_category == 1 && ('child' in category)) {
 							child = this.loopCategory(category.child,category.files);
 						}else{
 							child = null;
 						}
 						return (<li key={ikey}><Category
 							data={category}
-							reRender={this.reRender}/>{child}</li>);
+							reRender={this.reRender}
+							pushItem={this.pushItem}
+							/>{child}</li>);
 					}.bind(this))}
-
-					{files.map(function(file,ikey){
-						return (<li key={ikey+100}>{file.name}</li>);
-					}.bind(this))}
-			</ul>);
+				</ul>);
 	},
 	render: function() {
 		return (<div>{this.loopCategory(this.state.tree,[])}</div>);
