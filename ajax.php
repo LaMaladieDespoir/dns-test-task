@@ -17,7 +17,6 @@ class miniController{
                         case 'brush':
 			case 'getall':
 			case 'push':
-			case 'open':
 			case 'close':
 				$this->view = $_GET['view'];
 				break;
@@ -44,7 +43,7 @@ class miniController{
          */
 	private function getallRender(){
             $items = $this->database->select('categories',
-                            ['id_cat','id_parent','name','sort','open','is_category'],
+                            ['id_cat','id_parent','name','sort','is_category'],
                             ['ORDER' => 'categories.sort ASC']
                         );
             
@@ -144,9 +143,6 @@ class miniController{
                 );
             }
         }
-	private function openRender(){
-		exit('open');
-	}
 	private function closeRender(){
 		exit('close');
 	}

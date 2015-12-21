@@ -86,7 +86,9 @@ var Category = React.createClass({
 		return {};
 	},
 	handlerFolderClick: function(event) {
-		$(event.target).next('ul').toggle();
+		console.log(event.target);
+		$(event.target).parent().next('ul').toggle();
+
 	},
 	changeStyle:function(){
 		console.log('changeStyle');
