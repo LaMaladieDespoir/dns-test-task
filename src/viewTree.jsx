@@ -6,7 +6,10 @@ var Category = require('./viewCategory');
 
 var DnsTree = React.createClass({
 	getInitialState: function() {
-		return {tree:[]};
+		return {
+			tree:[],
+			loading:false
+		};
 	},
 	componentDidMount: function() {
 		this.refreshData();
@@ -16,10 +19,14 @@ var DnsTree = React.createClass({
 			console.log(data);
 			this.setState({
 				tree:data,
+				loading:false,
 			});
 		}.bind(this));
 	},
 	pushItem: function(request_var){
+		this.setState({
+			loading:true,
+		});
 		var context =this;
 		$.get('/ajax.php',request_var).done(function( data ) {
 			context.refreshData();
@@ -46,7 +53,12 @@ var DnsTree = React.createClass({
 				</ul>);
 	},
 	render: function() {
-		return (<div>{this.loopCategory(this.state.tree,[])}</div>);
+		var classHtml = (this.state.loading)?'loading':'';
+		var loading = (this.state.loading)?<div className="loader"></div>:'';
+		return (<div className={classHtml}>
+					<div>{this.loopCategory(this.state.tree,[])}</div>
+					{loading}
+				</div>);
 	}
 });
 
