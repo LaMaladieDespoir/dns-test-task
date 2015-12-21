@@ -1,0 +1,13 @@
+{
+    "name": "root/dns_tree",
+    "description": "test task",
+    "require": {
+        "catfan/medoo": "^1.0"
+    },
+    "authors": [
+        {
+            "name": "gaparchi",
+            "email": "peh626@gmail.com"
+        }
+    ]
+}
